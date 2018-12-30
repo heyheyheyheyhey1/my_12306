@@ -13,6 +13,8 @@ let status_Code = {
 
 
 let url = "https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-01-27&leftTicketDTO.from_station=BJQ&leftTicketDTO.to_station=LDQ&purpose_codes=ADULT"
+let query_timeOut = 1000
+let query_Times=1
 let headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36'
 }
@@ -69,7 +71,7 @@ function parse_Array_To_Json(arg) {
 }
 function checkSum(arg) {
     return new Promise((resolve, reject) => {
-        console.log(arg.length)
+        // console.log(arg.length)
         let value = []
         for (let i = 0; i < arg.length; i++) {
             if (arg[i].sum_hardSet != "" && arg[i].sum_hardSet != "无") {
@@ -77,10 +79,13 @@ function checkSum(arg) {
             }
         }
         if (value.length > 0) {
+            query_timeOut=120000
             resolve(value)
+            // timeOut=1
         }
         else{
-            reject("没票")
+            reject("无票")
+            timeOut=1000
         }
     })
 }
@@ -99,7 +104,10 @@ function gen_HTML(arg) {
         resolve(html)
     })
 }
-get_Info_By_Json(requestJson)
+
+function main(){
+    process.stdout.write("第 "+query_Times+++" 次查询:\t")
+    get_Info_By_Json(requestJson)
     .then(get_Array_From_Info)
     .then(parse_Array_To_Json)
     .then(checkSum)
@@ -107,3 +115,7 @@ get_Info_By_Json(requestJson)
     .then(mailer)
     .then(console.log)
     .catch(console.log)
+}
+
+
+setInterval(main,query_timeOut)
