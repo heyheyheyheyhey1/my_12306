@@ -27,11 +27,15 @@ let requestJson = {
 
 function get_Info_By_Json(arg) {
     return new Promise((resolve, reject) => {
-        request(requestJson, (error, response, body) => {
+        request(arg, (error, response, body) => {
+            // console.log(arg)
             if (!error && response.statusCode == 200) {
-                addr_Code = JSON.parse(body).data.map
-                // console.log(addr_Code)
-                // console.log(body)
+                try{
+                    addr_Code = JSON.parse(body).data.map
+                }
+                catch(e){
+                    reject("解析失败")
+                }
                 resolve(body)
             }
             else {
