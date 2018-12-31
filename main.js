@@ -58,6 +58,7 @@ async function get_Infos(arg) {
 
 function gen_JSON(arg) {
     requestJson.url = `https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-01-${arg}&leftTicketDTO.from_station=BJQ&leftTicketDTO.to_station=LDQ&purpose_codes=ADULT`
+    // requestJson.url = `https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-01-16&leftTicketDTO.from_station=YYQ&leftTicketDTO.to_station=LDQ&purpose_codes=ADULT`
     return requestJson
 }
 
