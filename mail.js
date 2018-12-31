@@ -17,7 +17,7 @@ module.exports = function (arg) {
         let json = {
             from: "912126472@qq.com",
             to: "912126472@qq.com",
-            subject: "有票了",
+            subject: "来票了!",
             html: arg
         }
         transport.sendMail(json, (err, info) => {
