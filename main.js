@@ -101,7 +101,7 @@ function checkSum(arg) {
         let value = []
         for (let i = 0; i < arg.length; i++) {
 
-            if (arg[i].sum_hardSet != "" && arg[i].sum_hardSet != "无") {
+            if (arg[i].sum_hardSet != "" && arg[i].sum_hardSet != "无"&&arg[i].sum_hardSet>=1) {
                 value.push(arg[i])
             }
         }
@@ -112,7 +112,7 @@ function checkSum(arg) {
         }
         else {
             reject(" 状态: 无票")
-            query_timeOut = 3000
+            query_timeOut = 1000
         }
     })
 }
@@ -134,7 +134,7 @@ function gen_HTML(arg) {
     })
 }
 function redo(){
-    setTimeout(main,query_timeOut,[27,28])
+    setTimeout(main,query_timeOut,query_date)
 }
 
 function main(arg) {
@@ -152,4 +152,5 @@ function main(arg) {
     
 }
 
-main([27, 28])
+let query_date=[ "27", "28"]
+main(query_date)
