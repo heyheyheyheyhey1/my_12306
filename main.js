@@ -1,4 +1,4 @@
-let request = require("request")
+﻿let request = require("request")
 let mailer = require('./mail')
 
 let addr_Code = {
@@ -13,8 +13,7 @@ let status_Code = {
 }
 
 
-// let url = "https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-01-16&leftTicketDTO.from_station=YYQ&leftTicketDTO.to_station=LDQ&purpose_codes=ADULT"
-let query_timeOut = 5000
+let query_timeOut = 3000
 let query_Times = 1
 let headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36'
@@ -30,11 +29,12 @@ function get_Info_By_Json(arg) {
         request(arg, (error, response, body) => {
             // console.log(arg)
             if (!error && response.statusCode == 200) {
-                try{
+                try {
                     addr_Code = JSON.parse(body).data.map
                 }
-                catch(e){
-                    reject("解析失败")
+                catch (e) {
+                    // console.log(body)
+                    reject("服务器暂时禁止")
                 }
                 resolve(body)
             }
@@ -57,8 +57,11 @@ async function get_Infos(arg) {
 }
 
 function gen_JSON(arg) {
-    requestJson.url = `https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-01-${arg}&leftTicketDTO.from_station=BJQ&leftTicketDTO.to_station=LDQ&purpose_codes=ADULT`
+    requestJson.url = `https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=2019-04-07&leftTicketDTO.from_station=LDQ&leftTicketDTO.to_station=YYQ&purpose_codes=ADULT`
     // requestJson.url = `https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-01-16&leftTicketDTO.from_station=YYQ&leftTicketDTO.to_station=LDQ&purpose_codes=ADULT`
+
+
+
     return requestJson
 }
 
@@ -99,11 +102,25 @@ function parse_Array_To_Json(arg) {
 function checkSum(arg) {
     return new Promise((resolve, reject) => {
         let value = []
+        let ignore= []
+        process.stdout.write("\t")
         for (let i = 0; i < arg.length; i++) {
-
-            if (arg[i].sum_hardSet != "" && arg[i].sum_hardSet != "无"&&arg[i].sum_hardSet>=1) {
-                value.push(arg[i])
+            if (arg[i].sum_hardSet != "" && arg[i].sum_hardSet != "无") {
+                if (train_ignore.indexOf(arg.stain_no)!=-1) {
+                    value.push(arg[i])
+                }
+                else {
+                    // console.log(ignore.indexOf(arg[i].stain_no))
+                    if(ignore.indexOf(arg[i].stain_no)==-1){
+                        ignore.push(arg[i].stain_no)
+                        // console.log(ignore)
+                    }
+                }
             }
+        }
+        if(ignore.length>0)process.stdout.write("忽略:\t")
+        for(let val of ignore){
+            process.stdout.write(val+"\t")
         }
         if (value.length > 0) {
             query_timeOut = 60000
@@ -112,7 +129,7 @@ function checkSum(arg) {
         }
         else {
             reject(" 状态: 无票")
-            query_timeOut = 1000
+            query_timeOut = 5000
         }
     })
 }
@@ -130,15 +147,15 @@ function gen_HTML(arg) {
                 + "无座: " + arg[i].sum_noSet + "<br>"
         }
         // console.log(html)
+        process.stdout.write("状态: "+arg.length+" 张\t")
         resolve(html)
     })
 }
-function redo(){
-    setTimeout(main,query_timeOut,query_date)
+function redo() {
+    setTimeout(main, query_timeOut, query_date)
 }
 
 function main(arg) {
-
     process.stdout.write("第 " + query_Times++ + " 次查询:\t")
     get_Infos(arg)
         .then(get_Array_From_Infos)
@@ -149,8 +166,8 @@ function main(arg) {
         .then(console.log)
         .catch(console.log)
         .then(redo)
-    
 }
 
-let query_date=[ "27", "28"]
+let query_date = ["20","21","22","23"]
+let train_ignore = ["k1804", "K635"]
 main(query_date)
